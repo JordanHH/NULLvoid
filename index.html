@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NULLvoid Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f5f5f0;
+      --accent: #d4a373;
+      --muted: #6b6b6b;
+      --card-bg: rgba(20, 20, 20, 0.85);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .ambient {
+      position: fixed;
+      width: 60vw;
+      height: 60vw;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ambient-1 {
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      top: -20%;
+      left: -10%;
+      animation: drift1 20s ease-in-out infinite;
+    }
+
+    .ambient-2 {
+      background: radial-gradient(circle, #7a6f5d 0%, transparent 70%);
+      bottom: -30%;
+      right: -20%;
+      animation: drift2 25s ease-in-out infinite;
+    }
+
+    @keyframes drift1 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(50px, 30px); }
+    }
+
+    @keyframes drift2 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-40px, -20px); }
+    }
+
+    .carousel-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      z-index: 1;
+    }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+
+    .art-piece {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: clamp(200px, 25vw, 350px);
+      transform-style: preserve-3d;
+      cursor: pointer;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                  opacity 0.6s ease,
+                  filter 0.6s ease;
+    }
+
+    .art-piece:hover {
+      z-index: 100;
+    }
+
+    .art-frame {
+      background: var(--card-bg);
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 1px rgba(255,255,255,0.1) inset;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .art-piece:hover .art-frame {
+      box-shadow: 0 50px 100px rgba(0,0,0,0.6), 0 0 40px rgba(212, 163, 115, 0.15), 0 0 1px rgba(255,255,255,0.2) inset;
+      border-color: rgba(212, 163, 115, 0.2);
+    }
+
+    .art-frame img {
+      width: 100%;
+      display: block;
+      filter: grayscale(30%) contrast(1.05);
+      transition: filter 0.5s ease;
+    }
+
+    .art-piece:hover .art-frame img {
+      filter: grayscale(0%) contrast(1.1);
+    }
+
+    .art-info {
+      padding: 14px 4px 6px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease 0.1s;
+    }
+
+    .art-piece:hover .art-info {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .art-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      margin-bottom: 4px;
+    }
+
+    .art-artist {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .nav-container {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 20px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.4s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.1);
+    }
+
+    .logo svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .logo-cube {
+      stroke: var(--fg);
+      stroke-width: 1;
+      fill: none;
+      opacity: 0.6;
+    }
+
+    .logo-atom {
+      fill: var(--accent);
+    }
+
+    .logo-orbit {
+      stroke: var(--fg);
+      stroke-width: 0.5;
+      fill: none;
+      opacity: 0.4;
+    }
+
+    .hamburger {
+      width: 36px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4px 0;
+      position: relative;
+      z-index: 600;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: var(--fg);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: center;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .menu-panel {
+      position: fixed;
+      bottom: 120px;
+      right: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 500;
+    }
+
+    .menu-panel.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .menu-link {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--fg);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .menu-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .menu-link:hover {
+      color: var(--accent);
+    }
+
+    .menu-link:hover::after {
+      width: 100%;
+      left: 0;
+      right: auto;
+    }
+
+    .page-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .page-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 40px;
+      left: 40px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      opacity: 0.5;
+      z-index: 100;
+    }
+
+    .scroll-hint {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      opacity: 0.4;
+      z-index: 100;
+    }
+
+    .scroll-hint::before,
+    .scroll-hint::after {
+      content: '';
+      width: 30px;
+      height: 1px;
+      background: var(--muted);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      width: 90%;
+      max-width: 900px;
+      max-height: 85vh;
+      background: var(--bg);
+      border: 1px solid rgba(255,255,255,0.08);
+      z-index: 850;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .modal-close:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal-close::before,
+    .modal-close::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 1px;
+      background: var(--fg);
+    }
+
+    .modal-close::before {
+      transform: rotate(45deg);
+    }
+
+    .modal-close::after {
+      transform: rotate(-45deg);
+    }
+
+    .modal-header {
+      padding: 48px 48px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .modal-artist-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .modal-artist-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--fg);
+      margin-bottom: 16px;
+    }
+
+    .modal-artist-bio {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    .modal-content {
+      padding: 32px 48px 48px;
+      overflow-y: auto;
+    }
+
+    .modal-grid-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    .modal-grid-item {
+      aspect-ratio: 1;
+      overflow: hidden;
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-grid-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .modal-grid-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%);
+      transition: filter 0.4s ease, transform 0.4s ease;
+    }
+
+    .modal-grid-item:hover img {
+      filter: grayscale(0%);
+      transform: scale(1.05);
+    }
+
+    /* Artwork Detail Modal */
+    .artwork-modal {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 860;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .artwork-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .artwork-modal-image {
+      max-width: 85%;
+      max-height: 85vh;
+      object-fit: contain;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    }
+
+    .artwork-modal-buy {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.3s ease;
+      background: none;
+      border: none;
+      padding: 8px 0;
+      font-family: 'Instrument Sans', sans-serif;
+    }
+
+    .artwork-modal-buy:hover {
+      color: var(--accent);
+    }
+
+    .artwork-modal-close {
+      position: fixed;
+      top: 32px;
+      right: 32px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0.5;
+    }
+
+    .artwork-modal-close:hover {
+      transform: rotate(90deg);
+      opacity: 1;
+    }
+
+    .artwork-modal-close::before,
+    .artwork-modal-close::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 1px;
+      background: var(--fg);
+    }
+
+    .artwork-modal-close::before {
+      transform: rotate(45deg);
+    }
+
+    .artwork-modal-close::after {
+      transform: rotate(-45deg);
+    }
+
+    /* Purchase Modal */
+    .purchase-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 870;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      backdrop-filter: blur(20px);
+    }
+
+    .purchase-modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .purchase-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      width: 90%;
+      max-width: 480px;
+      background: var(--bg);
+      border: 1px solid rgba(255,255,255,0.08);
+      z-index: 880;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 48px;
+    }
+
+    .purchase-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .purchase-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+      opacity: 0.5;
+    }
+
+    .purchase-modal-close:hover {
+      transform: rotate(90deg);
+      opacity: 1;
+    }
+
+    .purchase-modal-close::before,
+    .purchase-modal-close::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 1px;
+      background: var(--fg);
+    }
+
+    .purchase-modal-close::before {
+      transform: rotate(45deg);
+    }
+
+    .purchase-modal-close::after {
+      transform: rotate(-45deg);
+    }
+
+    .purchase-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 300;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .purchase-artist {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .purchase-section-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .print-sizes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .print-size-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .print-size-option:hover {
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .print-size-option.selected {
+      border-color: var(--accent);
+      background: rgba(212, 163, 115, 0.05);
+    }
+
+    .print-size-option input {
+      display: none;
+    }
+
+    .print-size-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .print-size-name {
+      font-size: 0.9rem;
+      color: var(--fg);
+    }
+
+    .print-size-dimensions {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .print-size-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: var(--fg);
+    }
+
+    .purchase-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 24px;
+    }
+
+    .purchase-total-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .purchase-total-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .purchase-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .purchase-btn:hover {
+      background: #e0b48a;
+    }
+
+    .purchase-btn:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .purchase-note {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    .speed-indicator {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.3;
+      z-index: 100;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .speed-indicator.left { left: 30px; }
+    .speed-indicator.right { right: 30px; }
+
+    .speed-indicator .arrow {
+      font-size: 1.2rem;
+      color: var(--muted);
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .speed-indicator.active { opacity: 0.8; }
+    .speed-indicator.active .arrow { color: var(--accent); }
+
+    .speed-indicator.left.active .arrow { animation: pulseLeft 0.5s ease infinite; }
+    .speed-indicator.right.active .arrow { animation: pulseRight 0.5s ease infinite; }
+
+    @keyframes pulseLeft {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-5px); }
+    }
+
+    @keyframes pulseRight {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(5px); }
+    }
+
+    @media (hover: hover) {
+      * { cursor: none; }
+      
+      .cursor {
+        position: fixed;
+        width: 8px;
+        height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        mix-blend-mode: difference;
+        transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+      }
+
+      .cursor.hover {
+        width: 40px;
+        height: 40px;
+        background: rgba(212, 163, 115, 0.3);
+        mix-blend-mode: normal;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-container { bottom: 24px; right: 24px; }
+      .menu-panel { right: 24px; bottom: 100px; }
+      .hint { display: none; }
+      .art-piece { width: clamp(150px, 40vw, 250px); }
+      .modal-header, .modal-content { padding-left: 24px; padding-right: 24px; }
+      .modal-grid { grid-template-columns: repeat(2, 1fr); }
+      .speed-indicator { display: none; }
+      .purchase-modal { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-1"></div>
+  <div class="ambient ambient-2"></div>
+  <div class="cursor"></div>
+
+  <div class="speed-indicator left" id="speedLeft">
+    <span class="arrow">‹</span>
+    <span class="arrow">‹</span>
+  </div>
+  <div class="speed-indicator right" id="speedRight">
+    <span class="arrow">›</span>
+    <span class="arrow">›</span>
+  </div>
+
+  <div class="carousel-container">
+    <div class="carousel" id="carousel"></div>
+  </div>
+
+  <div class="hint">Move cursor to control speed</div>
+  <div class="scroll-hint">Click artwork to explore</div>
+
+  <!-- Artist Modal -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal" id="modal">
+    <div class="modal-close" id="modalClose"></div>
+    <div class="modal-header">
+      <div class="modal-artist-label">Featured Artist</div>
+      <h2 class="modal-artist-name" id="modalArtistName"></h2>
+      <p class="modal-artist-bio" id="modalArtistBio"></p>
+    </div>
+    <div class="modal-content">
+      <div class="modal-grid-label">Selected Works</div>
+      <div class="modal-grid" id="modalGrid"></div>
+    </div>
+  </div>
+
+  <!-- Artwork Detail Modal -->
+  <div class="artwork-modal" id="artworkModal">
+    <button class="artwork-modal-buy" id="artworkBuyBtn">Buy Print</button>
+    <img class="artwork-modal-image" id="artworkModalImage" src="" alt="">
+    <div class="artwork-modal-close" id="artworkModalClose"></div>
+  </div>
+
+  <!-- Purchase Modal -->
+  <div class="purchase-modal-overlay" id="purchaseOverlay"></div>
+  <div class="purchase-modal" id="purchaseModal">
+    <div class="purchase-modal-close" id="purchaseClose"></div>
+    <h3 class="purchase-title" id="purchaseTitle"></h3>
+    <div class="purchase-artist" id="purchaseArtist"></div>
+    <div class="purchase-section-label">Select Print Size</div>
+    <div class="print-sizes" id="printSizes"></div>
+    <div class="purchase-total">
+      <span class="purchase-total-label">Total</span>
+      <span class="purchase-total-price" id="purchaseTotalPrice">$0</span>
+    </div>
+    <button class="purchase-btn" id="purchaseBtn" disabled>Add to Cart</button>
+    <p class="purchase-note">Free shipping on orders over $500<br>Archival pigment print on museum-quality paper</p>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav-container">
+    <a href="index.html" class="logo" aria-label="Home">
+      <svg viewBox="0 0 48 48">
+        <g class="logo-cube">
+          <path d="M12 16 L28 12 L36 20 L20 24 Z"/>
+          <path d="M12 28 L28 24 L36 32 L20 36 Z"/>
+          <line x1="12" y1="16" x2="12" y2="28"/>
+          <line x1="28" y1="12" x2="28" y2="24"/>
+          <line x1="36" y1="20" x2="36" y2="32"/>
+          <line x1="20" y1="24" x2="20" y2="36"/>
+        </g>
+        <g class="logo-atom" transform="translate(24, 24)">
+          <circle cx="0" cy="0" r="2.5"/>
+          <circle cx="6" cy="0" r="1"/>
+          <circle cx="-3" cy="5.2" r="1"/>
+          <circle cx="-3" cy="-5.2" r="1"/>
+        </g>
+        <g class="logo-orbit" transform="translate(24, 24)">
+          <ellipse cx="0" cy="0" rx="8" ry="3" transform="rotate(0)"/>
+          <ellipse cx="0" cy="0" rx="8" ry="3" transform="rotate(60)"/>
+          <ellipse cx="0" cy="0" rx="8" ry="3" transform="rotate(-60)"/>
+        </g>
+      </svg>
+    </a>
+    <div class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <div class="menu-panel" id="menuPanel">
+    <a href="about.html" class="menu-link">About</a>
+    <a href="contact.html" class="menu-link">Contact</a>
+  </div>
+
+  <div class="page-overlay" id="pageOverlay"></div>
+
+  <script>
+    /**
+     * DATABASE SCHEMA (Backend Reference)
+     * 
+     * artists: id, name, bio, created_at
+     * artworks: id, artist_id, title, image_url, year_created, medium, is_available
+     * print_sizes: id, name, dimensions, base_price_cents, sort_order
+     * artwork_prints: id, artwork_id, print_size_id, price_cents, edition_size, edition_sold
+     * orders: id, customer_email, shipping_address, status, total_cents, stripe_payment_intent_id
+     * order_items: id, order_id, artwork_print_id, quantity, price_cents, edition_number
+     * cart_items: id, session_id, artwork_print_id, quantity, created_at
+     * 
+     * API ENDPOINTS:
+     * GET  /api/artists, /api/artists/:id
+     * GET  /api/artworks/:id, /api/artworks/:id/prints
+     * POST /api/cart/add, GET /api/cart
+     * POST /api/checkout, POST /api/webhooks/stripe
+     */
+
+    const PrintSizes = {
+      SMALL: { id: 'size_small', name: 'Small', dimensions: '8" × 10"', basePriceCents: 12000 },
+      MEDIUM: { id: 'size_medium', name: 'Medium', dimensions: '16" × 20"', basePriceCents: 28000 },
+      LARGE: { id: 'size_large', name: 'Large', dimensions: '24" × 30"', basePriceCents: 45000 },
+      XLARGE: { id: 'size_xlarge', name: 'Extra Large', dimensions: '36" × 48"', basePriceCents: 85000 }
+    };
+
+    const CartService = {
+      sessionId: crypto.randomUUID(),
+      items: [],
+      async addItem(artworkId, printSizeId, priceCents) {
+        const item = { id: crypto.randomUUID(), artworkId, printSizeId, priceCents, quantity: 1 };
+        this.items.push(item);
+        console.log('[Cart] Added:', item);
+        return item;
+      }
+    };
+
+    const artworks = [
+      { 
+        id: 'art_001', src: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&q=80', 
+        title: 'Ethereal Forms', artist: 'Marcus Chen', artistId: 'artist_001',
+        bio: 'Marcus Chen explores the boundaries between form and void, creating works that challenge our perception of space.',
+        works: [
+          { id: 'art_001', src: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&q=80', title: 'Ethereal Forms' },
+          { id: 'art_002', src: 'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=400&q=80', title: 'Luminous Void' },
+          { id: 'art_003', src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80', title: 'Suspended Light' },
+          { id: 'art_004', src: 'https://images.unsplash.com/photo-1617503752587-97d2103a96ea?w=400&q=80', title: 'Fragment Study I' },
+          { id: 'art_005', src: 'https://images.unsplash.com/photo-1604076913837-52ab5629fba9?w=400&q=80', title: 'Dissolution' },
+          { id: 'art_006', src: 'https://images.unsplash.com/photo-1620121692029-d088224ddc74?w=400&q=80', title: 'Emergence' }
+        ]
+      },
+      { 
+        id: 'art_007', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=600&q=80', 
+        title: 'Abstract Meditation', artist: 'Yuki Tanaka', artistId: 'artist_002',
+        bio: 'Drawing from Zen philosophy and contemporary digital aesthetics, Yuki Tanaka creates meditative visual experiences.',
+        works: [
+          { id: 'art_007', src: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=400&q=80', title: 'Abstract Meditation' },
+          { id: 'art_008', src: 'https://images.unsplash.com/photo-1553949345-eb786bb3f7ba?w=400&q=80', title: 'Zen Passage' },
+          { id: 'art_009', src: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=400&q=80', title: 'Stillness' },
+          { id: 'art_010', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', title: 'Flow State' },
+          { id: 'art_011', src: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=400&q=80', title: 'Breath' },
+          { id: 'art_012', src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', title: 'Emptiness' }
+        ]
+      },
+      { 
+        id: 'art_013', src: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=600&q=80', 
+        title: 'Chromatic Study', artist: 'Elena Vasquez', artistId: 'artist_003',
+        bio: 'Elena Vasquez investigates color theory through large-scale installations and intimate works on paper.',
+        works: [
+          { id: 'art_013', src: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=400&q=80', title: 'Chromatic Study' },
+          { id: 'art_014', src: 'https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&q=80', title: 'Spectrum I' },
+          { id: 'art_015', src: 'https://images.unsplash.com/photo-1567359781514-3b964e2b04d6?w=400&q=80', title: 'Color Field' },
+          { id: 'art_016', src: 'https://images.unsplash.com/photo-1552083375-1447ce886485?w=400&q=80', title: 'Gradient' },
+          { id: 'art_017', src: 'https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=400&q=80', title: 'Saturation' },
+          { id: 'art_018', src: 'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?w=400&q=80', title: 'Hue Shift' }
+        ]
+      },
+      { 
+        id: 'art_019', src: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80', 
+        title: 'Urban Fragments', artist: 'James Wright', artistId: 'artist_004',
+        bio: 'James Wright captures the poetry of urban decay, finding beauty in the overlooked corners of city life.',
+        works: [
+          { id: 'art_019', src: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&q=80', title: 'Urban Fragments' },
+          { id: 'art_020', src: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=400&q=80', title: 'Concrete Poetry' },
+          { id: 'art_021', src: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=400&q=80', title: 'Rust & Memory' },
+          { id: 'art_022', src: 'https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=400&q=80', title: 'Palimpsest' },
+          { id: 'art_023', src: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=400&q=80', title: 'Layers' },
+          { id: 'art_024', src: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&q=80', title: 'Weathered' }
+        ]
+      },
+      { 
+        id: 'art_025', src: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=600&q=80', 
+        title: 'Silent Conversation', artist: 'Anna Kowalski', artistId: 'artist_005',
+        bio: 'Anna Kowalski examines human connection and isolation through abstract portraiture.',
+        works: [
+          { id: 'art_025', src: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=400&q=80', title: 'Silent Conversation' },
+          { id: 'art_026', src: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=400&q=80', title: 'Distance' },
+          { id: 'art_027', src: 'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=400&q=80', title: 'Presence' },
+          { id: 'art_028', src: 'https://images.unsplash.com/photo-1582201942988-13e60e4556ee?w=400&q=80', title: 'Absence' },
+          { id: 'art_029', src: 'https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=400&q=80', title: 'Echo' },
+          { id: 'art_030', src: 'https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=400&q=80', title: 'Whisper' }
+        ]
+      },
+      { 
+        id: 'art_031', src: 'https://images.unsplash.com/photo-1482160549825-59d1b23cb208?w=600&q=80', 
+        title: 'Light & Shadow', artist: 'David Park', artistId: 'artist_006',
+        bio: 'David Park works with light as his primary medium, creating immersive environments.',
+        works: [
+          { id: 'art_031', src: 'https://images.unsplash.com/photo-1482160549825-59d1b23cb208?w=400&q=80', title: 'Light & Shadow' },
+          { id: 'art_032', src: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=400&q=80', title: 'Refraction' },
+          { id: 'art_033', src: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?w=400&q=80', title: 'Diffusion' },
+          { id: 'art_034', src: 'https://images.unsplash.com/photo-1553949345-eb786bb3f7ba?w=400&q=80', title: 'Penumbra' },
+          { id: 'art_035', src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', title: 'Chiaroscuro' },
+          { id: 'art_036', src: 'https://images.unsplash.com/photo-1516541196182-6bdb0516ed27?w=400&q=80', title: 'Golden Hour' }
+        ]
+      },
+      { 
+        id: 'art_037', src: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&q=80', 
+        title: 'Geometric Dreams', artist: 'Sophie Laurent', artistId: 'artist_007',
+        bio: 'Sophie Laurent combines mathematical precision with intuitive mark-making.',
+        works: [
+          { id: 'art_037', src: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=400&q=80', title: 'Geometric Dreams' },
+          { id: 'art_038', src: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&q=80', title: 'Tessellation' },
+          { id: 'art_039', src: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=400&q=80', title: 'Fractal' },
+          { id: 'art_040', src: 'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?w=400&q=80', title: 'Symmetry' },
+          { id: 'art_041', src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80', title: 'Pattern' },
+          { id: 'art_042', src: 'https://images.unsplash.com/photo-1604076913837-52ab5629fba9?w=400&q=80', title: 'Grid' }
+        ]
+      },
+      { 
+        id: 'art_043', src: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=600&q=80', 
+        title: 'Fluid Motion', artist: 'Raj Patel', artistId: 'artist_008',
+        bio: 'Raj Patel explores natural phenomena and human perception through kinetic installations.',
+        works: [
+          { id: 'art_043', src: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=400&q=80', title: 'Fluid Motion' },
+          { id: 'art_044', src: 'https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&q=80', title: 'Turbulence' },
+          { id: 'art_045', src: 'https://images.unsplash.com/photo-1567359781514-3b964e2b04d6?w=400&q=80', title: 'Current' },
+          { id: 'art_046', src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', title: 'Wave' },
+          { id: 'art_047', src: 'https://images.unsplash.com/photo-1620121692029-d088224ddc74?w=400&q=80', title: 'Ripple' },
+          { id: 'art_048', src: 'https://images.unsplash.com/photo-1617503752587-97d2103a96ea?w=400&q=80', title: 'Vortex' }
+        ]
+      }
+    ];
+
+    // State
+    let rotation = 0, targetRotation = 0, mouseX = window.innerWidth / 2, cursorSpeed = 0;
+    let modalOpen = false, artworkModalOpen = false, purchaseModalOpen = false;
+    let currentArtistIndex = null, currentArtwork = null, selectedPrintSize = null;
+
+    // DOM
+    const carousel = document.getElementById('carousel');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
+    const modalArtistName = document.getElementById('modalArtistName');
+    const modalArtistBio = document.getElementById('modalArtistBio');
+    const modalGrid = document.getElementById('modalGrid');
+    const speedLeft = document.getElementById('speedLeft');
+    const speedRight = document.getElementById('speedRight');
+    const artworkModal = document.getElementById('artworkModal');
+    const artworkModalImage = document.getElementById('artworkModalImage');
+    const artworkBuyBtn = document.getElementById('artworkBuyBtn');
+    const artworkModalClose = document.getElementById('artworkModalClose');
+    const purchaseOverlay = document.getElementById('purchaseOverlay');
+    const purchaseModal = document.getElementById('purchaseModal');
+    const purchaseClose = document.getElementById('purchaseClose');
+    const purchaseTitle = document.getElementById('purchaseTitle');
+    const purchaseArtist = document.getElementById('purchaseArtist');
+    const printSizesContainer = document.getElementById('printSizes');
+    const purchaseTotalPrice = document.getElementById('purchaseTotalPrice');
+    const purchaseBtn = document.getElementById('purchaseBtn');
+
+    // Carousel
+    function createCarousel() {
+      artworks.forEach((art, i) => {
+        const piece = document.createElement('div');
+        piece.className = 'art-piece';
+        piece.dataset.index = i;
+        piece.innerHTML = `
+          <div class="art-frame">
+            <img src="${art.src}" alt="${art.title}" loading="lazy">
+            <div class="art-info">
+              <div class="art-title">${art.title}</div>
+              <div class="art-artist">${art.artist}</div>
+            </div>
+          </div>
+        `;
+        piece.addEventListener('click', (e) => { e.stopPropagation(); openArtistModal(i); });
+        carousel.appendChild(piece);
+      });
+      updatePositions();
+    }
+
+    function updatePositions() {
+      const pieces = document.querySelectorAll('.art-piece');
+      const radius = Math.min(window.innerWidth * 0.4, 500);
+      const total = pieces.length;
+
+      pieces.forEach((piece, i) => {
+        const angle = (rotation / 180) * Math.PI + (i / total) * Math.PI * 2;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * radius - radius * 0.5;
+        const y = Math.sin(angle * 0.5) * 30;
+        const rotateY = -angle * (180 / Math.PI);
+        const scale = (z + radius * 1.5) / (radius * 2);
+        const opacity = 0.3 + scale * 0.7;
+        const blur = z < -100 ? Math.abs(z + 100) / 200 : 0;
+
+        piece.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px) rotateY(${rotateY}deg) scale(${0.6 + scale * 0.4})`;
+        piece.style.opacity = opacity;
+        piece.style.filter = blur > 0 ? `blur(${blur}px)` : 'none';
+        piece.style.zIndex = Math.round(scale * 100);
+      });
+    }
+
+    function animate() {
+      if (!modalOpen && !artworkModalOpen && !purchaseModalOpen) {
+        const centerX = window.innerWidth / 2;
+        const distanceFromCenter = (mouseX - centerX) / centerX;
+        const deadZone = 0.1;
+        let speed = 0;
+        
+        if (Math.abs(distanceFromCenter) > deadZone) {
+          const normalizedDistance = (Math.abs(distanceFromCenter) - deadZone) / (1 - deadZone);
+          speed = Math.sign(distanceFromCenter) * normalizedDistance * 0.975;
+        }
+        
+        cursorSpeed += (speed - cursorSpeed) * 0.05;
+        
+        if (cursorSpeed < -0.1) { speedLeft.classList.add('active'); speedRight.classList.remove('active'); }
+        else if (cursorSpeed > 0.1) { speedRight.classList.add('active'); speedLeft.classList.remove('active'); }
+        else { speedLeft.classList.remove('active'); speedRight.classList.remove('active'); }
+        
+        targetRotation += cursorSpeed;
+      }
+      rotation += (targetRotation - rotation) * 0.08;
+      updatePositions();
+      requestAnimationFrame(animate);
+    }
+
+    // Artist Modal
+    function openArtistModal(index) {
+      const art = artworks[index];
+      currentArtistIndex = index;
+      modalOpen = true;
+      modalArtistName.textContent = art.artist;
+      modalArtistBio.textContent = art.bio;
+      
+      modalGrid.innerHTML = '';
+      art.works.forEach((work, i) => {
+        const item = document.createElement('div');
+        item.className = 'modal-grid-item';
+        item.innerHTML = `<img src="${work.src}" alt="${work.title}" loading="lazy">`;
+        item.addEventListener('click', () => openArtworkModal(work, art.artist));
+        modalGrid.appendChild(item);
+      });
+      
+      modalOverlay.classList.add('active');
+      modal.classList.add('active');
+    }
+
+    function closeArtistModal() {
+      modalOpen = false;
+      currentArtistIndex = null;
+      modalOverlay.classList.remove('active');
+      modal.classList.remove('active');
+    }
+
+    // Artwork Detail Modal
+    function openArtworkModal(work, artistName) {
+      currentArtwork = { ...work, artistName };
+      artworkModalOpen = true;
+      artworkModalImage.src = work.src.replace('w=400', 'w=1200');
+      artworkModalImage.alt = work.title;
+      artworkModal.classList.add('active');
+    }
+
+    function closeArtworkModal() {
+      artworkModalOpen = false;
+      currentArtwork = null;
+      artworkModal.classList.remove('active');
+    }
+
+    // Purchase Modal
+    function openPurchaseModal() {
+      if (!currentArtwork) return;
+      purchaseModalOpen = true;
+      selectedPrintSize = null;
+      purchaseTitle.textContent = currentArtwork.title;
+      purchaseArtist.textContent = `by ${currentArtwork.artistName}`;
+      
+      printSizesContainer.innerHTML = '';
+      Object.values(PrintSizes).forEach(size => {
+        const option = document.createElement('label');
+        option.className = 'print-size-option';
+        option.innerHTML = `
+          <input type="radio" name="printSize" value="${size.id}">
+          <div class="print-size-details">
+            <span class="print-size-name">${size.name}</span>
+            <span class="print-size-dimensions">${size.dimensions}</span>
+          </div>
+          <span class="print-size-price">$${(size.basePriceCents / 100).toLocaleString()}</span>
+        `;
+        option.addEventListener('click', () => {
+          document.querySelectorAll('.print-size-option').forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          selectedPrintSize = size;
+          updatePurchaseTotal();
+        });
+        printSizesContainer.appendChild(option);
+      });
+      
+      updatePurchaseTotal();
+      purchaseOverlay.classList.add('active');
+      purchaseModal.classList.add('active');
+    }
+
+    function closePurchaseModal() {
+      purchaseModalOpen = false;
+      selectedPrintSize = null;
+      purchaseOverlay.classList.remove('active');
+      purchaseModal.classList.remove('active');
+    }
+
+    function updatePurchaseTotal() {
+      if (selectedPrintSize) {
+        purchaseTotalPrice.textContent = `$${(selectedPrintSize.basePriceCents / 100).toLocaleString()}`;
+        purchaseBtn.disabled = false;
+      } else {
+        purchaseTotalPrice.textContent = '$0';
+        purchaseBtn.disabled = true;
+      }
+    }
+
+    async function handlePurchase() {
+      if (!currentArtwork || !selectedPrintSize) return;
+      purchaseBtn.disabled = true;
+      purchaseBtn.textContent = 'Adding...';
+      
+      await CartService.addItem(currentArtwork.id, selectedPrintSize.id, selectedPrintSize.basePriceCents);
+      purchaseBtn.textContent = 'Added to Cart ✓';
+      
+      setTimeout(() => {
+        closePurchaseModal();
+        purchaseBtn.textContent = 'Add to Cart';
+        purchaseBtn.disabled = true;
+      }, 1500);
+    }
+
+    // Events
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      const cursor = document.querySelector('.cursor');
+      if (cursor) { cursor.style.left = e.clientX - 4 + 'px'; cursor.style.top = e.clientY - 4 + 'px'; }
+    });
+
+    modalClose.addEventListener('click', closeArtistModal);
+    modalOverlay.addEventListener('click', closeArtistModal);
+    artworkModalClose.addEventListener('click', closeArtworkModal);
+    artworkBuyBtn.addEventListener('click', openPurchaseModal);
+    purchaseClose.addEventListener('click', closePurchaseModal);
+    purchaseOverlay.addEventListener('click', closePurchaseModal);
+    purchaseBtn.addEventListener('click', handlePurchase);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (purchaseModalOpen) closePurchaseModal();
+        else if (artworkModalOpen) closeArtworkModal();
+        else if (modalOpen) closeArtistModal();
+      }
+    });
+
+    const cursor = document.querySelector('.cursor');
+    if (cursor) {
+      document.querySelectorAll('a, .hamburger, .art-piece, .modal-close, .modal-grid-item, .artwork-modal-close, .artwork-modal-buy, .purchase-modal-close, .print-size-option, .purchase-btn').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+      });
+    }
+
+    const hamburger = document.getElementById('hamburger');
+    const menuPanel = document.getElementById('menuPanel');
+    hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); menuPanel.classList.toggle('active'); });
+
+    const pageOverlay = document.getElementById('pageOverlay');
+    document.querySelectorAll('.menu-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        pageOverlay.classList.add('active');
+        setTimeout(() => { window.location.href = link.getAttribute('href'); }, 500);
+      });
+    });
+
+    window.addEventListener('wheel', (e) => { if (!modalOpen && !artworkModalOpen && !purchaseModalOpen) { e.preventDefault(); targetRotation += e.deltaY * 0.1; } }, { passive: false });
+    window.addEventListener('resize', updatePositions);
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchmove', (e) => { if (!modalOpen && !artworkModalOpen && !purchaseModalOpen) { const delta = e.touches[0].clientX - touchStartX; targetRotation += delta * 0.3; touchStartX = e.touches[0].clientX; } }, { passive: true });
+
+    createCarousel();
+    animate();
+    console.log('[Gallery] Initialized | Session:', CartService.sessionId);
+  </script>
+</body>
+</html>
